@@ -1,0 +1,14 @@
+1=='1' => type same xaina vane type change garxa ani compare garxa value
+
+1==='1' => type same xaina vane sidhai false
+
+
+var newElement = document.createElement('p);
+newElement.setAttribute('class','name');
+newElement.innerHTML = 'Name:John';
+box.appendChild(newElement);
+
+
+fps = 60
+frame-limit=1000/fps;
+

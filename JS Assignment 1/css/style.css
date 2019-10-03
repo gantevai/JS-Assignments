@@ -1,0 +1,38 @@
+body{
+  background-color: skyblue;
+}
+.container {
+  overflow: hidden;
+  position: relative;
+  margin:0 auto;
+}
+
+.wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.wrapper img {
+  float: left;
+}
+
+.left-btn,.right-btn{
+  height: 20px;
+  position:absolute;
+  width: 20px;
+  background-color: black;
+}
+
+.left-btn{
+  top:50%;
+  left:0;
+}
+
+.right-btn{
+  top:50%;
+  right:0;
+}
+
+
+
