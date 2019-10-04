@@ -1,0 +1,49 @@
+.container {
+  overflow: hidden;
+  position: relative;
+  margin: 3%;
+  float: left;
+}
+
+.wrapper {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+.wrapper img {
+  float: left;
+}
+
+.left-btn,
+.right-btn {
+  height: 20px;
+  position: absolute;
+  width: 20px;
+  background-color: black;
+  color: white;
+}
+
+.left-btn {
+  top: 50%;
+  left: 0;
+}
+
+.right-btn {
+  top: 50%;
+  right: 0;
+}
+.indicator-list {
+  position: absolute;
+  bottom: 0;
+  left: 40%;
+}
+
+.dot-indicator {
+  height: 20px;
+  width: 20px;
+  background-color: gray;
+  border-radius: 50%;
+  display: inline-block;
+}
