@@ -37,13 +37,13 @@ body {
   top: 50%;
   right: 0;
 }
-.indicator {
+.indicator-list {
   position: absolute;
   bottom: 0;
   left: 40%;
 }
 
-.dots{
+.dot-indicator {
   height: 20px;
   width: 20px;
   background-color: gray;
