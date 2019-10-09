@@ -1,6 +1,6 @@
 const SPEED = [-1, 1];
-const GAME_WIDTH = 1200;
-const GAME_HEIGHT = 500;
+const GAME_WIDTH = 640;
+const GAME_HEIGHT = 600;
 const GAME_ANIMATION_FRAME = 20;
 const ANT_WIDTH = 28;
 const ANT_HEIGHT = 35;
@@ -8,9 +8,6 @@ const SMASH_AUDIO = new Audio();
 SMASH_AUDIO.src = 'js/smash.mp3';
 const GAME_COMPLETE = new Audio();
 GAME_COMPLETE.src = 'js/game-complete.mp3';
-let scoreBox = document.getElementById('score');
-let score = 0;
-let difficultyChanged = false;
 
 function getRandomValue(min, max) {
   min = Math.ceil(min);
@@ -19,8 +16,8 @@ function getRandomValue(min, max) {
 }
 
 class Ant {
-  constructor(parentElement) {
-    this.parentElement = parentElement;
+  constructor(gameContext) {
+    this.parentElement = gameContext.parentElement;
     this.create();
     this.directionX = SPEED[getRandomValue(0, SPEED.length)];
     this.directionY = SPEED[getRandomValue(0, SPEED.length)];
@@ -31,8 +28,8 @@ class Ant {
         this.element.classList.add('dead');
         this.isSmashed = true;
         SMASH_AUDIO.play();
-        score++;
-        scoreBox.innerHTML = score;
+        gameContext.score++;
+        gameContext.scoreBox.innerHTML = gameContext.score;
         setTimeout(() => {
           this.parentElement.removeChild(this.element);
         }, 1000);
@@ -90,14 +87,17 @@ class Ant {
 }
 
 class Game {
+  score = 0;
+  difficultyChanged = false;
   antArray = [];
   xyArray = [];
 
   constructor(gameWrapperId, antCount) {
     this.parentElement = document.getElementById(gameWrapperId);
+    this.scoreBox = this.parentElement.getElementsByClassName('score')[0];
     this.parentElement.style.width = GAME_WIDTH + 'px';
     this.parentElement.style.height = GAME_HEIGHT + 'px';
-    scoreBox.innerHTML = score;
+    this.scoreBox.innerHTML = this.score;
     this.antCount = antCount;
     this.init();
   }
@@ -109,7 +109,7 @@ class Game {
 
   createAnts() {
     for (var i = 0; i < this.antCount; i++) {
-      this.ant = new Ant(this.parentElement);
+      this.ant = new Ant(this);
       this.createNewPositionAndCheckOverlaps();
       this.ant.setPosition(this.xyArray[i].x, this.xyArray[i].y);
       this.ant.draw();
@@ -139,18 +139,18 @@ class Game {
       this.detectOverallCollision();
       this.checkDeadAnt();
     }
-    if (!difficultyChanged) {
+    if (!this.difficultyChanged) {
       this.changeDifficulty();
     }
   }
 
   changeDifficulty() {
-    if (score >= 10 && score % 5 == 0) {
+    if (this.score >= 10 && this.score % 5 == 0) {
       for (var i = 0; i < this.antArray.length; i++) {
         this.antArray[i].directionX *= 3;
         this.antArray[i].directionY *= 3;
       }
-      difficultyChanged = true;
+      this.difficultyChanged = true;
     }
   }
 
@@ -209,4 +209,5 @@ class Game {
   }
 }
 
-new Game('game-wrapper', 20);
+new Game('game-wrapper1', 20);
+new Game('game-wrapper2', 20);

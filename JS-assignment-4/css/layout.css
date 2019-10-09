@@ -14,8 +14,9 @@
 .game-wrapper {
   position: relative;
   border: 5px solid green;
-  margin: 50px 50px;
+  margin: 10px;
   cursor: pointer;
+  float: left;
 }
 
 .score-box {

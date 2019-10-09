@@ -167,4 +167,5 @@ class Game {
   }
 }
 
-new Game('game-wrapper', 50);
+new Game('game-wrapper1', 20);
+new Game('game-wrapper2', 20);
