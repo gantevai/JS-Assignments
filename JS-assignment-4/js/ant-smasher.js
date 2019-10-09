@@ -164,17 +164,6 @@ class Game {
       GAME_COMPLETE.play();
       alert('CONGRATULATIONS!!! YOU SMASHED ALL ANTS');
     }
-    // } else if (this.antArray.length <= 20) {
-    //   for (var i = 0; i < this.antArray.length; i++) {
-    //     this.antArray[i].directionX *= 2;
-    //     this.antArray[i].directionY *= 2;
-    //   }
-    // } else if (this.antArray.length <= 10) {
-    //   for (var i = 0; i < this.antArray.length; i++) {
-    //     this.antArray[i].directionX *= 3;
-    //     this.antArray[i].directionY *= 3;
-    //   }
-    // }
   }
 
   detectOverallCollision() {

@@ -15,6 +15,7 @@
   position: relative;
   border: 5px solid green;
   margin: 50px 50px;
+  cursor: pointer;
 }
 
 .score-box {
