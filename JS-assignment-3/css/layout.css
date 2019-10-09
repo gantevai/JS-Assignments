@@ -7,4 +7,5 @@
 .game-wrapper {
   position: relative;
   border: 5px solid green;
+  margin: 50px auto;
 }

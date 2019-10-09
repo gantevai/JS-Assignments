@@ -1,0 +1,23 @@
+.ants {
+  position: absolute;
+  height: 35px;
+  width: 28px;
+  background-image: url(../images/ant.gif);
+  background-size: 100% 100%;
+  transition: transform 0.1s ease;
+}
+
+.dead {
+  background-color: red;
+  background-image: none;
+}
+
+.game-wrapper {
+  position: relative;
+  border: 5px solid green;
+  margin: 50px 50px;
+}
+
+.score-box {
+  text-align: center;
+}

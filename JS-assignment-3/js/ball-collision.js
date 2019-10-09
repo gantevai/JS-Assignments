@@ -1,8 +1,8 @@
 const BALL_SIZES = [10, 12, 14, 16, 18, 20];
 const BALL_MASS_UNIT = 1.5; //per 1 unit size
 const SPEED = [-1, 1];
-const GAME_WIDTH = 1300;
-const GAME_HEIGHT = 700;
+const GAME_WIDTH = 800;
+const GAME_HEIGHT = 500;
 const GAME_ANIMATION_FRAME = 20;
 const COLORS = ['red', 'blue', 'green', 'orange'];
 
@@ -63,6 +63,7 @@ class Ball {
 
 class Game {
   ballArray = [];
+  xyArray = [];
 
   constructor(gameWrapperId, ballCount) {
     this.parentElement = document.getElementById(gameWrapperId);
@@ -80,12 +81,31 @@ class Game {
   createBalls() {
     for (var i = 0; i < this.ballCount; i++) {
       this.ball = new Ball(this.parentElement);
-      var randomX = getRandomValue(0, GAME_WIDTH - 50);
-      var randomY = getRandomValue(0, GAME_HEIGHT - 50);
-      this.ball.setPosition(randomX, randomY);
+      this.createNewPositionAndCheckOverlaps();
+      this.ball.setPosition(this.xyArray[i].x, this.xyArray[i].y);
       this.ball.draw();
       this.ballArray.push(this.ball);
     }
+    console.log(this.xyArray);
+  }
+
+  createNewPositionAndCheckOverlaps() {
+    var maxBallSize = BALL_SIZES[BALL_SIZES.length - 1];
+    var randomX = getRandomValue(0, GAME_WIDTH - maxBallSize);
+    var randomY = getRandomValue(0, GAME_HEIGHT - maxBallSize);
+
+    for (var i = 0; i < this.xyArray.length; i++) {
+      if (
+        randomX >= this.xyArray[i].x &&
+        randomX <= this.xyArray[i].x + maxBallSize &&
+        randomY >= this.xyArray[i].y &&
+        randomY <= this.xyArray[i].y + maxBallSize
+      ) {
+        this.createNewPositionAndCheckOverlaps();
+      }
+    }
+
+    this.xyArray.push({ x: randomX, y: randomY });
   }
 
   moveBalls() {
