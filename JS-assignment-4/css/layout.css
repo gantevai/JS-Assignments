@@ -2,14 +2,13 @@
   position: absolute;
   height: 35px;
   width: 28px;
-  background-image: url(../images/ant.gif);
+  background-image: url(../images/ants.gif);
   background-size: 100% 100%;
   transition: transform 0.1s ease;
 }
 
 .dead {
-  background-color: red;
-  background-image: none;
+  background-image: url(../images/blood-patch.png);
 }
 
 .game-wrapper {

@@ -1,4 +1,4 @@
-const SPEED = [-3, 3];
+const SPEED = [-1, 1];
 const GAME_WIDTH = 1200;
 const GAME_HEIGHT = 500;
 const GAME_ANIMATION_FRAME = 20;
@@ -10,6 +10,7 @@ const GAME_COMPLETE = new Audio();
 GAME_COMPLETE.src = 'js/game-complete.mp3';
 let scoreBox = document.getElementById('score');
 let score = 0;
+let difficultyChanged = false;
 
 function getRandomValue(min, max) {
   min = Math.ceil(min);
@@ -138,6 +139,19 @@ class Game {
       this.detectOverallCollision();
       this.checkDeadAnt();
     }
+    if (!difficultyChanged) {
+      this.changeDifficulty();
+    }
+  }
+
+  changeDifficulty() {
+    if (score >= 10 && score % 5 == 0) {
+      for (var i = 0; i < this.antArray.length; i++) {
+        this.antArray[i].directionX *= 3;
+        this.antArray[i].directionY *= 3;
+      }
+      difficultyChanged = true;
+    }
   }
 
   checkDeadAnt() {
@@ -206,4 +220,4 @@ class Game {
   }
 }
 
-new Game('game-wrapper', 15);
+new Game('game-wrapper', 20);
