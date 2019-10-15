@@ -2,7 +2,6 @@
   width: 850px;
   height: 650px;
   position: relative;
-  border: 2px black solid;
   margin: 0 auto;
   overflow: hidden;
 }
@@ -52,9 +51,10 @@
   background-color: black;
   color: white;
   border: none;
+  z-index: 1;
   outline: none;
 }
-.game-over {
+.high-score {
   top: 30%;
   left: 50%;
   transform: translateX(-50%);
@@ -63,5 +63,27 @@
   position: absolute;
   background-color: black;
   color: white;
+  z-index: 1;
+}
+
+.score {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+  font-size: 32px;
+  color: black;
+  z-index: 1;
+  display: none;
+}
+
+.ammo-notification {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  color: red;
   display: none;
 }

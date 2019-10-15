@@ -6,11 +6,17 @@ const LANE_WIDTH = 130;
 const OBSTACLE_POSITION = [185, 315, 445, 575];
 const CAR_WIDTH = 80;
 const CAR_HEIGHT = 150;
+const OBSTACLE_START_POSITION = -200;
 const BULLET_WIDTH = 15;
 const BULLET_HEIGHT = 45;
+const BULLET_SPEED = 3;
+const BULLET_INTERVAL = 500; //in millisecond
 const GAME_HEIGHT = 650;
 const GAME_WIDTH = 850;
 
+/**
+ * For Shuffling Array Elements
+ */
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -25,125 +31,14 @@ function getRandomValue(min, max) {
   return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
-class Car {
-  constructor(gameContainer) {
-    this.gameContainer = gameContainer;
-    this.createPlayerCar();
-  }
-
-  createPlayerCar() {
-    this.car = document.createElement('div');
-    this.car.classList.add('player-car');
-    this.car.style.bottom = 0;
-    this.car.style.left = '315px';
-    this.gameContainer.appendChild(this.car);
-    this.positionX = this.car.offsetLeft;
-    this.positionY = this.car.offsetTop;
-  }
-
-  moveCar(direction) {
-    this.car.style.transition = '0.5s ease';
-    if (direction == 'left') {
-      if (this.positionX != LEFT_END) {
-        this.positionX -= LANE_WIDTH;
-      }
-    } else if (direction == 'right') {
-      if (this.positionX != RIGHT_END) {
-        this.positionX += LANE_WIDTH;
-      }
-    }
-    this.updateCarHorizontalPosition();
-  }
-
-  updateCarHorizontalPosition() {
-    this.car.style.left = this.positionX + 'px';
-  }
-}
-
-class Bullet {
-  isDestroyed = false;
-
-  constructor(gameContainer) {
-    this.gameContainer = gameContainer;
-    this.car = gameContainer.getElementsByClassName('player-car')[0];
-    this.create();
-  }
-
-  create() {
-    this.bullet = document.createElement('div');
-    this.bullet.classList.add('bullet');
-    this.bulletPositionX = this.car.offsetLeft + 32;
-    this.bullet.style.left = this.bulletPositionX + 'px';
-    this.bulletPositionY = GAME_HEIGHT - CAR_HEIGHT - BULLET_HEIGHT;
-    this.bullet.style.top = this.bulletPositionY + 'px';
-    this.gameContainer.appendChild(this.bullet);
-  }
-
-  move() {
-    this.bulletPositionY -= 3;
-    this.updateBulletPosition();
-    this.checkBulletPassOutOfScreen();
-  }
-
-  updateBulletPosition() {
-    this.bullet.style.top = this.bulletPositionY + 'px';
-  }
-
-  checkBulletPassOutOfScreen() {
-    if (this.bulletPositionY <= -BULLET_HEIGHT) {
-      this.isDestroyed = true;
-    }
-  }
-
-  destroyBullet() {
-    this.gameContainer.removeChild(this.bullet);
-  }
-}
-
-class Obstacle {
-  isDestroyed = false;
-
-  constructor(gameContainer) {
-    this.gameContainer = gameContainer;
-    this.createObstacleCar();
-  }
-  createObstacleCar() {
-    this.obstacle = document.createElement('div');
-    this.obstacle.classList.add('obstacle-car');
-    this.positionY = this.obstacle.offsetTop;
-    this.gameContainer.appendChild(this.obstacle);
-  }
-
-  setObstaclePosition(position) {
-    this.obstacle.style.left = position + 'px';
-    this.positionX = position;
-  }
-
-  moveObstacle() {
-    this.positionY += 2;
-    this.updateObstacleVerticalPosition();
-  }
-
-  updateObstacleVerticalPosition() {
-    this.obstacle.style.top = this.positionY + 'px';
-  }
-
-  checkCollisionAtEnd() {
-    if (this.positionY >= 650) {
-      this.isDestroyed = true;
-    }
-  }
-
-  destroy() {
-    this.gameContainer.removeChild(this.obstacle);
-  }
-}
-
 class Game {
   obstacleCars = [];
   bulletCount = 10;
   bulletArray = [];
   firedBullet = false;
+  score = 0;
+  speed = { obstacle: 2, backgroundRoad: 5 };
+  obstacleInterval = 2300;
 
   constructor() {
     this.createGameFields();
@@ -155,36 +50,56 @@ class Game {
    */
   showMenu() {
     this.playButton = document.createElement('button');
-    this.gameOverDisplay = document.createElement('div');
+    this.highScoreDisplay = document.createElement('div');
+    this.scoreDisplay = document.createElement('div');
+    this.ammoNotification = document.createElement('div');
     this.playButton.innerText = 'CLICK TO START';
-    this.gameOverDisplay.innerText = 'GAME OVER PLAY AGAIN';
     this.playButton.classList.add('play-button');
-    this.gameOverDisplay.classList.add('game-over');
+    this.highScoreDisplay.classList.add('high-score');
+    this.ammoNotification.classList.add('ammo-notification');
+    this.scoreDisplay.classList.add('score');
     this.gameContainer.appendChild(this.playButton);
-    this.gameContainer.appendChild(this.gameOverDisplay);
+    this.gameContainer.appendChild(this.highScoreDisplay);
+    this.gameContainer.appendChild(this.scoreDisplay);
+    this.gameContainer.appendChild(this.ammoNotification);
+    this.getHighScore();
+
     this.playButton.onclick = () => {
-      this.playButton.style.display = 'none'; //hide the play button
-      this.createPlayerCar();
-      this.moveBackground = setInterval(
-        function() {
-          this.moveRoadBackground();
-          this.moveObstacles();
-          this.checkOverallCollision();
-          this.checkDestroyedObstacles();
-        }.bind(this),
-        FRAME_LIMIT
-      );
-      this.createObstacles = setInterval(
-        function() {
-          this.createObstacleCars();
-        }.bind(this),
-        2300
-      );
-      this.checkKeyPress();
+      this.playgame();
     };
-    this.gameOverDisplay;
   }
 
+  playgame() {
+    this.playButton.style.display = 'none'; //hide the play button and highscore display
+    this.highScoreDisplay.style.display = 'none';
+    this.scoreDisplay.style.display = 'block';
+
+    //Updating score per second
+    this.updateScore = setInterval(
+      function() {
+        this.score++;
+        this.scoreDisplay.innerText = `SCORE : ${this.score}`;
+        this.increaseSpeed();
+      }.bind(this),
+      1000
+    );
+
+    this.createPlayerCar();
+    this.moveBackground = setInterval(
+      function() {
+        this.moveRoadBackground();
+        this.moveObstacles();
+      }.bind(this),
+      FRAME_LIMIT
+    );
+    this.createObstacles = setInterval(
+      function() {
+        this.createObstacleCars();
+      }.bind(this),
+      this.obstacleInterval
+    );
+    this.checkKeyPress();
+  }
   /**
    * Create the container for the game and the wrapper for the road background.
    * Add classes to the container and wrapper
@@ -204,10 +119,58 @@ class Game {
   }
 
   /**
+   * Get and set highscore from the localStorage.
+   */
+  getHighScore() {
+    if (!localStorage.getItem('highscore')) {
+      localStorage.setItem('highscore', 0);
+    }
+    this.highScoreDisplay.innerText = `HIGHSCORE : ${localStorage.getItem('highscore')}`;
+  }
+
+  setHighScore() {
+    var highscore = parseInt(localStorage.getItem('highscore'));
+    if (this.score > highscore) {
+      localStorage.setItem('highscore', this.score);
+    }
+    this.getHighScore();
+  }
+
+  /**
+   *  Increasing the difficulty of the game
+   */
+
+  increaseSpeed() {
+    if (this.score == 20) {
+      this.speed.backgroundRoad = 7;
+      this.speed.obstacle = 4;
+      this.obstacleInterval = 1200;
+      clearInterval(this.createObstacles);
+      this.createObstacles = setInterval(
+        function() {
+          this.createObstacleCars();
+        }.bind(this),
+        this.obstacleInterval
+      );
+    } else if (this.score == 40) {
+      this.speed.backgroundRoad = 9;
+      this.speed.obstacle = 6;
+      this.obstacleInterval = 800;
+      clearInterval(this.createObstacles);
+      this.createObstacles = setInterval(
+        function() {
+          this.createObstacleCars();
+        }.bind(this),
+        this.obstacleInterval
+      );
+    }
+  }
+
+  /**
    * Move the background road by increasing top value of the game wrapper
    */
   moveRoadBackground() {
-    this.topValue += 5;
+    this.topValue += this.speed.backgroundRoad;
     this.checkAndRepeatRoadBackground();
     this.updateRoadBackground();
   }
@@ -228,10 +191,16 @@ class Game {
     }
   }
 
+  /**
+   * Create a player car
+   */
   createPlayerCar() {
     this.car = new Car(this.gameContainer);
   }
 
+  /**
+   * Create obstacle cars
+   */
   createObstacleCars() {
     var obstacleCount = getRandomValue(1, OBSTACLE_POSITION.length);
     // console.log(obstacleCount);
@@ -243,13 +212,20 @@ class Game {
     shuffle(OBSTACLE_POSITION);
   }
 
+  /**
+   * Move the obstacle cars
+   */
   moveObstacles() {
     for (var i = 0; i < this.obstacleCars.length; i++) {
-      this.obstacleCars[i].moveObstacle();
+      this.obstacleCars[i].moveObstacle(this.speed.obstacle);
       this.checkOverallCollision();
+      this.checkDestroyedObstaclesAndBullets();
     }
   }
 
+  /**
+   * Check overallcollision of bullet-obstacle  and car-obstacle
+   */
   checkOverallCollision() {
     for (var i = 0; i < this.obstacleCars.length; i++) {
       this.obstacleCars[i].checkCollisionAtEnd();
@@ -258,8 +234,20 @@ class Game {
         this.gameOver();
       }
     }
+
+    for (var i = 0; i < this.bulletArray.length; i++) {
+      for (var j = 0; j < this.obstacleCars.length; j++) {
+        if (this.checkBulletCollision(this.bulletArray[i], this.obstacleCars[j])) {
+          this.bulletArray[i].isDestroyed = true;
+          this.obstacleCars[j].isDestroyed = true;
+        }
+      }
+    }
   }
 
+  /**
+   * Check collision of car-obstacle
+   */
   checkCarCollision(car, obstacle) {
     if (
       car.positionX < obstacle.positionX + CAR_WIDTH &&
@@ -272,21 +260,48 @@ class Game {
     } else return false;
   }
 
-  checkDestroyedObstacles() {
+  /**
+   * Check collision of bullet-obstacle
+   */
+  checkBulletCollision(bullet, obstacle) {
+    if (
+      bullet.bulletPositionX < obstacle.positionX + CAR_WIDTH &&
+      bullet.bulletPositionX + BULLET_WIDTH > obstacle.positionX &&
+      bullet.bulletPositionY < obstacle.positionY + CAR_HEIGHT &&
+      bullet.bulletPositionY + BULLET_HEIGHT > obstacle.positionY
+    ) {
+      return true;
+    } else return false;
+  }
+
+  /**
+   * Check for destroyed obstacles and bullets to remove them from game
+   */
+  checkDestroyedObstaclesAndBullets() {
     for (var i = 0; i < this.obstacleCars.length; i++) {
       if (this.obstacleCars[i].isDestroyed) {
         this.obstacleCars[i].destroy();
         this.obstacleCars.splice(i, 1);
       }
     }
+
+    for (var i = 0; i < this.bulletArray.length; i++) {
+      if (this.bulletArray[i].isDestroyed) {
+        this.bulletArray[i].destroy();
+        this.bulletArray.splice(i, 1);
+      }
+    }
   }
 
+  /**
+   * Check which key is pressed
+   */
   checkKeyPress() {
     document.onkeydown = event => {
       const keyPressed = event.code;
-      if (keyPressed == 'ArrowLeft') {
+      if (keyPressed == 'ArrowLeft' || keyPressed == 'KeyA') {
         this.car.moveCar('left');
-      } else if (keyPressed == 'ArrowRight') {
+      } else if (keyPressed == 'ArrowRight' || keyPressed == 'KeyD') {
         this.car.moveCar('right');
       } else if (keyPressed == 'Space') {
         if (!this.firedBullet) {
@@ -296,14 +311,45 @@ class Game {
             function() {
               this.firedBullet = false;
             }.bind(this),
-            500
+            BULLET_INTERVAL
           );
         }
       }
     };
   }
 
+  /**
+   *  Create Bullets
+   */
   createBullets() {
+    if (this.bulletCount == 0) {
+      this.ammoNotification.style.display = 'block';
+      this.ammoNotification.innerText = 'No Ammo!!! Reloading';
+      setTimeout(
+        function() {
+          this.ammoNotification.style.display = 'none';
+        }.bind(this),
+        500
+      );
+
+      //REARM WITH AMMO AFTER 15 SECONDS
+      setTimeout(
+        function() {
+          this.bulletCount = 10;
+          this.ammoNotification.style.display = 'block';
+          this.ammoNotification.innerText = 'Ammo Reloaded';
+          setTimeout(
+            function() {
+              this.ammoNotification.style.display = 'none';
+            }.bind(this),
+            500
+          );
+        }.bind(this),
+        15000
+      );
+      return;
+    }
+    this.bulletCount--;
     this.bullet = new Bullet(this.gameContainer);
     this.bulletArray.push(this.bullet);
     clearInterval(this.bulletMover);
@@ -315,17 +361,35 @@ class Game {
     );
   }
 
+  /**
+   * Move Bullets forward
+   */
   moveBullets() {
     for (var i = 0; i < this.bulletArray.length; i++) {
       this.bulletArray[i].move();
     }
   }
 
+  /**
+   * End the game
+   */
+
   gameOver() {
+    this.car.destroy();
     clearInterval(this.moveBackground);
     clearInterval(this.createObstacles);
-    this.gameOverDisplay.style.display = 'block';
+    clearInterval(this.updateScore);
+    this.highScoreDisplay.style.display = 'block';
+    var mainMenu = document.createElement('button');
+    mainMenu.classList.add('play-button');
+    mainMenu.style.display = 'block';
+    mainMenu.innerText = 'MAIN MENU';
+
+    mainMenu.onclick = () => {
+      location.reload();
+    };
+    this.gameContainer.appendChild(mainMenu);
+    this.setHighScore();
   }
 }
-
-new Game();
+var game = new Game();
