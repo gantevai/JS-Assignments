@@ -1,0 +1,60 @@
+.game-container {
+  width: 850px;
+  height: 650px;
+  position: relative;
+  border: 2px black solid;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.wrapper {
+  position: absolute;
+  width: 100%;
+  background-image: url(../images/long-road.png);
+  height: 1300px;
+  top: -650px;
+}
+
+.player-car,
+.obstacle-car {
+  position: absolute;
+  width: 80px;
+  height: 150px;
+  background-size: 100% 100%;
+}
+
+.player-car {
+  background-image: url(../images/car.png);
+  bottom: 0;
+  left: 315px;
+}
+
+.obstacle-car {
+  background-image: url(../images/villain-car.png);
+  transform: rotate(180deg);
+  top: -200px;
+}
+
+.play-button {
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 36px;
+  position: absolute;
+  background-color: black;
+  color: white;
+  border: none;
+  outline: none;
+}
+.game-over {
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+  font-size: 40px;
+  position: absolute;
+  background-color: black;
+  color: white;
+  display: none;
+}

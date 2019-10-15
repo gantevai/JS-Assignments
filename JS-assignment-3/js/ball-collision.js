@@ -1,8 +1,8 @@
 const BALL_SIZES = [10, 12, 14, 16, 18, 20];
 const BALL_MASS_UNIT = 1.5; //per 1 unit size
 const SPEED = [-1, 1];
-const GAME_WIDTH = 800;
-const GAME_HEIGHT = 500;
+const GAME_WIDTH = 1300;
+const GAME_HEIGHT = 1300;
 const GAME_ANIMATION_FRAME = 20;
 const COLORS = ['red', 'blue', 'green', 'orange'];
 
@@ -86,7 +86,6 @@ class Game {
       this.ball.draw();
       this.ballArray.push(this.ball);
     }
-    console.log(this.xyArray);
   }
 
   createNewPositionAndCheckOverlaps() {
@@ -140,7 +139,6 @@ class Game {
     var distance = Math.sqrt(dx * dx + dy * dy);
 
     if (distance <= r1 + r2) {
-      console.log('Collision');
       return true;
     } else return false;
   }
@@ -167,5 +165,5 @@ class Game {
   }
 }
 
-new Game('game-wrapper1', 20);
-new Game('game-wrapper2', 20);
+new Game('game-wrapper1', 1000);
+// new Game('game-wrapper2', 20);
