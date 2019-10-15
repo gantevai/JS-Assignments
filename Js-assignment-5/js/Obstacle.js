@@ -33,7 +33,7 @@ class Obstacle {
   }
 
   destroy() {
-    this.obstacle.style.backgroundImage = 'url(../images/explosion.png)';
+    this.obstacle.style.backgroundImage = 'url(images/explosion.png)';
     setTimeout(() => {
       this.gameContainer.removeChild(this.obstacle);
     }, 500);

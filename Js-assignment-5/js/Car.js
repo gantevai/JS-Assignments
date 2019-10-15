@@ -40,7 +40,7 @@ class Car {
   }
 
   destroy() {
-    this.car.style.backgroundImage = 'url(../images/explosion.png)';
+    this.car.style.backgroundImage = 'url(images/explosion.png)';
   }
 
   animate(direction) {
