@@ -65,13 +65,14 @@ class Bullet {
 
   constructor(gameContainer) {
     this.gameContainer = gameContainer;
+    this.car = gameContainer.getElementsByClassName('player-car')[0];
     this.create();
   }
 
   create() {
     this.bullet = document.createElement('div');
     this.bullet.classList.add('bullet');
-    this.bulletPositionX = this.positionX + 32;
+    this.bulletPositionX = this.car.offsetLeft + 32;
     this.bullet.style.left = this.bulletPositionX + 'px';
     this.bulletPositionY = GAME_HEIGHT - CAR_HEIGHT - BULLET_HEIGHT;
     this.bullet.style.top = this.bulletPositionY + 'px';
@@ -142,6 +143,7 @@ class Game {
   obstacleCars = [];
   bulletCount = 10;
   bulletArray = [];
+  firedBullet = false;
 
   constructor() {
     this.createGameFields();
@@ -287,7 +289,16 @@ class Game {
       } else if (keyPressed == 'ArrowRight') {
         this.car.moveCar('right');
       } else if (keyPressed == 'Space') {
-        this.createBullets();
+        if (!this.firedBullet) {
+          this.createBullets();
+          this.firedBullet = true;
+          setTimeout(
+            function() {
+              this.firedBullet = false;
+            }.bind(this),
+            500
+          );
+        }
       }
     };
   }
@@ -295,7 +306,6 @@ class Game {
   createBullets() {
     this.bullet = new Bullet(this.gameContainer);
     this.bulletArray.push(this.bullet);
-    if()
     clearInterval(this.bulletMover);
     this.bulletMover = setInterval(
       function() {
