@@ -4,6 +4,7 @@ class Bird {
   birdPositionX = 200;
   birdPositionY = 200;
   birdBackgroundPositionX = 0;
+  isDead = false;
 
   constructor(gameContainer) {
     this.gameContainer = gameContainer;
@@ -27,12 +28,14 @@ class Bird {
 
   flyBird(jumpPower) {
     this.birdPositionY -= jumpPower;
-    this.bird.style.transform = 'rotate(-45deg)'; 
+    this.birdElement.style.transform = 'rotate(-45deg)';
     this.updateBirdPositionYInDOM();
   }
 
   updateBirdPositionYInDOM() {
+    this.checkUpDownCollision();
     this.birdElement.style.top = this.birdPositionY + 'px';
+    // this.birdElement.style.transform = 'rotate(45deg)';
   }
 
   dropBird(gravity) {
@@ -45,6 +48,12 @@ class Bird {
     this.birdBackgroundPositionX -= this.birdWidth;
     if (this.birdBackgroundPositionX <= -174) {
       this.birdBackgroundPositionX = 0;
+    }
+  }
+
+  checkUpDownCollision() {
+    if (this.birdPositionY <= 0 || this.birdPositionY + this.birdHeight >= 512) {
+      this.isDead = true;
     }
   }
 }

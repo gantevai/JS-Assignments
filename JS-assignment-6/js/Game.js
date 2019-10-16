@@ -6,14 +6,20 @@ class Game {
     this.init(fps);
     this.createField();
     this.createBird();
-    this.moveBackgroundImage = setInterval(
+    this.play = setInterval(
       function() {
         this.moveBackground();
         this.moveGround();
         this.bird.dropBird(this.gravity);
+        this.checkCollisions();
         this.bird.animateBirdFly();
         this.gravity += 0.25;
-        this.createPipes();
+        this.pipeMovementCounter++;
+        if (this.pipeMovementCounter == 120) {
+          this.createPipes();
+          this.pipeMovementCounter = 0;
+        }
+        this.movePipes();
       }.bind(this),
       this.frameLimit
     );
@@ -27,8 +33,9 @@ class Game {
     this.backgroundSpeed = 1;
     this.groundSpeed = 5;
     this.gravity = 0.25;
-    this.jumpPower = 70;
+    this.jumpPower = 75;
     this.pipeArray = [];
+    this.pipeMovementCounter = 0; // counter to manage the interval between pipes
   }
 
   createField() {
@@ -84,6 +91,43 @@ class Game {
   createPipes() {
     this.pipe = new Pipe(this.gameContainer);
     this.pipeArray.push(this.pipe);
+  }
+
+  movePipes() {
+    for (var i = 0; i < this.pipeArray.length; i++) {
+      this.pipeArray[i].move();
+    }
+  }
+
+  checkCollisions() {
+    //Check if bird is dead by collision
+    if (this.bird.isDead) {
+      this.gameOver();
+    }
+    //Check if first pipe is out of screen
+
+    if (this.pipeArray.length != 0) {
+      this.pipeArray[0].checkPipeOutOfScreen();
+      if (this.pipeArray[0].isDestroyed) {
+        this.pipeArray.shift();
+      }
+    }
+  }
+
+//   checkBirdPipeCollision(pipe) {
+//     if (this.bird.b)
+//       if (
+//         this.bird.birdPositionX < rect2.x + rect2.width &&
+//         this.bird.birdPositionX + this.bird.birdPositionX.width > rect2.x &&
+//         this.bird.birdPositionY < rect2.y + rect2.height &&
+//         this.bird.birdPositionY + this.bird.birdPositionX.height > rect2.y
+//       ) {
+//         // collision detected!
+//       }
+  }
+
+  gameOver() {
+    clearInterval(this.play);
   }
 }
 
