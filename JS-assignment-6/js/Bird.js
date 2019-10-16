@@ -26,21 +26,40 @@ class Bird {
     this.birdElement.style.top = y + 'px';
   }
 
+  birdFaceDown() {
+    this.birdElement.style.transform = 'rotate(35deg)';
+  }
+
+  birdFaceUp() {
+    this.birdElement.style.transform = 'rotate(-35deg)';
+  }
+
   flyBird(jumpPower) {
     this.birdPositionY -= jumpPower;
-    this.birdElement.style.transform = 'rotate(-45deg)';
+    this.birdFaceUp();
+    setTimeout(
+      function() {
+        this.birdFaceDown();
+      }.bind(this),
+      200
+    );
     this.updateBirdPositionYInDOM();
   }
 
   updateBirdPositionYInDOM() {
     this.checkUpDownCollision();
     this.birdElement.style.top = this.birdPositionY + 'px';
-    // this.birdElement.style.transform = 'rotate(45deg)';
   }
 
   dropBird(gravity) {
     this.birdPositionY += gravity;
     this.updateBirdPositionYInDOM();
+  }
+
+  deadFall(gravity) {
+    this.birdPositionY += gravity;
+    this.birdElement.style.top = this.birdPositionY + 'px';
+    this.birdElement.style.transform = 'rotate(90deg)';
   }
 
   animateBirdFly() {

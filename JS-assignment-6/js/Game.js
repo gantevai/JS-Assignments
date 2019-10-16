@@ -1,7 +1,17 @@
 import Bird from '../js/Bird.js';
 import Pipe from './Pipe.js';
 
+const FLAP_AUDIO = new Audio();
+FLAP_AUDIO.src = 'audio/flapwing.mp3';
+
+const SCORE_AUDIO = new Audio();
+SCORE_AUDIO.src = 'audio/score.mp3';
+
+const GAMEOVER_AUDIO = new Audio();
+GAMEOVER_AUDIO.src = 'audio/gameover.mp3';
+
 class Game {
+  skyHeight = 512;
   constructor(fps) {
     this.fps = fps;
     this.init();
@@ -15,12 +25,51 @@ class Game {
     this.startDisplay = document.createElement('div');
     this.startDisplay.classList.add('start-menu');
     this.gameContainer.appendChild(this.startDisplay);
+    this.handleMovement();
+  }
+
+  handleMovement(restart) {
     document.onkeydown = event => {
       if (event.code == 'Space') {
-        this.startDisplay.style.display = 'none';
-        document.onkeydown = null;
+        if (restart) {
+          clearInterval(this.deadBirdFall);
+          this.gameContainer.innerHTML = '';
+          this.init();
+          this.createScoreDisplay();
+          this.createBird();
+        } else {
+          this.startDisplay.style.display = 'none';
+          document.onkeydown = null;
+        }
+
+        setTimeout(
+          function() {
+            this.bird.birdFaceDown();
+          }.bind(this),
+          200
+        );
         this.play = setInterval(this.startGame.bind(this), this.frameLimit);
       }
+    };
+    this.gameContainer.onmousedown = event => {
+      if (restart) {
+        clearInterval(this.deadBirdFall);
+        this.gameContainer.innerHTML = '';
+        this.init();
+        this.createScoreDisplay();
+        this.createBird();
+      } else {
+        this.startDisplay.style.display = 'none';
+        document.onkeydown = null;
+      }
+
+      setTimeout(
+        function() {
+          this.bird.birdFaceDown();
+        }.bind(this),
+        200
+      );
+      this.play = setInterval(this.startGame.bind(this), this.frameLimit);
     };
   }
 
@@ -29,7 +78,10 @@ class Game {
     this.moveBackground();
     this.bird.dropBird(this.gravity);
     this.checkCollisions();
-    this.bird.animateBirdFly();
+    if (this.animateBirdCounter % 5 == 0) {
+      this.bird.animateBirdFly();
+    }
+    this.animateBirdCounter++;
     this.gravity += 0.25;
     this.pipeMovementCounter++;
     if (this.pipeMovementCounter == 120) {
@@ -47,10 +99,12 @@ class Game {
     this.backgroundSpeed = 0.25;
     this.groundSpeed = 2;
     this.gravity = 0.25;
+    this.flyGravityValue = -3;
     this.jumpPower = 75;
     this.pipeArray = [];
     this.score = 0;
     this.pipeMovementCounter = 0; // counter to manage the interval between pipes
+    this.animateBirdCounter = 0; // counter to manage animation of bird
   }
 
   createField() {
@@ -101,9 +155,15 @@ class Game {
   checkKeyPress() {
     document.onkeydown = event => {
       if (event.code == 'Space') {
-        this.gravity = 0.25;
+        this.gravity = this.flyGravityValue;
+        FLAP_AUDIO.play();
         this.bird.flyBird(this.jumpPower);
       }
+    };
+    this.gameContainer.onmousedown = event => {
+      this.gravity = this.flyGravityValue;
+      FLAP_AUDIO.play();
+      this.bird.flyBird(this.jumpPower);
     };
   }
 
@@ -169,6 +229,7 @@ class Game {
       if (!this.pipeArray[i].isScored) {
         if (this.pipeArray[i].passedByPlayer) {
           this.score++;
+          SCORE_AUDIO.play();
           this.pipeArray[i].isScored = true;
           // console.log(this.score);
         }
@@ -190,9 +251,20 @@ class Game {
   }
 
   gameOver() {
+    GAMEOVER_AUDIO.play();
     clearInterval(this.play);
     document.onkeydown = null;
     this.gameOverMenu();
+    this.deadBirdFall = setInterval(
+      function() {
+        this.bird.deadFall(this.gravity);
+        this.gravity += 0.5;
+        if (this.bird.birdPositionY + this.bird.birdHeight > this.skyHeight) {
+          clearInterval(this.deadBirdFall);
+        }
+      }.bind(this),
+      this.frameLimit
+    );
   }
 
   gameOverMenu() {
@@ -209,16 +281,7 @@ class Game {
     this.endScoreDisplay.innerText = this.score;
     this.setHighScore();
 
-    document.onkeydown = event => {
-      if (event.code == 'Space') {
-        this.gameContainer.innerHTML = '';
-        this.init();
-        // this.createField();
-        this.createScoreDisplay();
-        this.createBird();
-        this.play = setInterval(this.startGame.bind(this), this.frameLimit);
-      }
-    };
+    this.handleMovement(true);
   }
 
   setHighScore() {

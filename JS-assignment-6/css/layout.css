@@ -5,7 +5,8 @@
   src: url('../fonts/04B_19__.woff') format('woff');
 }
 .game-container {
-  float: left;
+  /* float: left; */
+  margin: auto;
   position: relative;
   overflow: hidden;
 }
