@@ -4,6 +4,10 @@
   font-weight: normal;
   src: url('../fonts/04B_19__.woff') format('woff');
 }
+
+body {
+  background-color: black;
+}
 .game-container {
   /* float: left; */
   margin: auto;
