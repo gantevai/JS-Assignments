@@ -1,0 +1,42 @@
+.game-container {
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.bird {
+  position: absolute;
+  background-image: url(../images/flappy-sprite.png);
+  background-position: 0 0;
+  background-size: cover;
+}
+
+.background-wrapper {
+  position: absolute;
+  background-image: url(../images/background.png);
+  background-repeat: repeat-x;
+  height: 512px;
+  width: 1200px;
+  background-position: 0 0;
+}
+
+.ground-wrapper {
+  position: absolute;
+  background-image: url(../images/ground.png);
+  bottom: 0;
+  background-repeat: repeat-x;
+  width: 1200px;
+  height: 138px;
+}
+
+.pipe {
+  position: absolute;
+  background-image: url(../images/ground.png);
+  left: 600px;
+  width: 60px;
+  background-size: cover;
+}
+
+.invert-pipe {
+  transform: rotate(180deg);
+}
