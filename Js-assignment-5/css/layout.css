@@ -1,3 +1,6 @@
+body {
+  background-color: black;
+}
 .game-container {
   width: 850px;
   height: 650px;
