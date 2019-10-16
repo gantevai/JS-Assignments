@@ -379,6 +379,7 @@ class Game {
     clearInterval(this.moveBackground);
     clearInterval(this.createObstacles);
     clearInterval(this.updateScore);
+    document.onkeydown = null;
     this.highScoreDisplay.style.display = 'block';
     var mainMenu = document.createElement('button');
     mainMenu.classList.add('play-button');
