@@ -3,38 +3,53 @@ import Pipe from './Pipe.js';
 
 class Game {
   constructor(fps) {
-    this.init(fps);
+    this.fps = fps;
+    this.init();
     this.createField();
+    this.createScoreDisplay();
     this.createBird();
-    this.play = setInterval(
-      function() {
-        this.moveBackground();
-        this.moveGround();
-        this.bird.dropBird(this.gravity);
-        this.checkCollisions();
-        this.bird.animateBirdFly();
-        this.gravity += 0.25;
-        this.pipeMovementCounter++;
-        if (this.pipeMovementCounter == 120) {
-          this.createPipes();
-          this.pipeMovementCounter = 0;
-        }
-        this.movePipes();
-      }.bind(this),
-      this.frameLimit
-    );
-    this.checkKeyPress();
+    this.startMenu();
   }
 
-  init(fps) {
-    this.frameLimit = 1000 / fps;
+  startMenu() {
+    this.startDisplay = document.createElement('div');
+    this.startDisplay.classList.add('start-menu');
+    this.gameContainer.appendChild(this.startDisplay);
+    document.onkeydown = event => {
+      if (event.code == 'Space') {
+        this.startDisplay.style.display = 'none';
+        document.onkeydown = null;
+        this.play = setInterval(this.startGame.bind(this), this.frameLimit);
+      }
+    };
+  }
+
+  startGame() {
+    this.checkKeyPress();
+    this.moveBackground();
+    this.bird.dropBird(this.gravity);
+    this.checkCollisions();
+    this.bird.animateBirdFly();
+    this.gravity += 0.25;
+    this.pipeMovementCounter++;
+    if (this.pipeMovementCounter == 120) {
+      this.createPipes();
+      this.pipeMovementCounter = 0;
+    }
+    this.movePipes();
+    this.updateScore();
+  }
+
+  init() {
+    this.frameLimit = 1000 / this.fps;
     this.gameContainerWidth = 600;
     this.gameContainerHeight = 650;
-    this.backgroundSpeed = 1;
-    this.groundSpeed = 5;
+    this.backgroundSpeed = 0.25;
+    this.groundSpeed = 2;
     this.gravity = 0.25;
     this.jumpPower = 75;
     this.pipeArray = [];
+    this.score = 0;
     this.pipeMovementCounter = 0; // counter to manage the interval between pipes
   }
 
@@ -45,6 +60,12 @@ class Game {
     this.gameContainer.style.width = this.gameContainerWidth + 'px';
     this.gameContainer.style.height = this.gameContainerHeight + 'px';
     this.body.appendChild(this.gameContainer);
+  }
+
+  createScoreDisplay() {
+    this.scoreDisplay = document.createElement('div');
+    this.scoreDisplay.classList.add('score-display');
+    this.gameContainer.appendChild(this.scoreDisplay);
     this.createBackgroundAndGround();
   }
 
@@ -69,9 +90,7 @@ class Game {
       this.backgroundLeft = 0;
     }
     this.backgroundWrapper.style.left = this.backgroundLeft + 'px';
-  }
 
-  moveGround() {
     this.groundLeft -= this.groundSpeed;
     if (this.groundLeft <= -this.gameContainerWidth) {
       this.groundLeft = 0;
@@ -112,22 +131,106 @@ class Game {
         this.pipeArray.shift();
       }
     }
+
+    for (var i = 0; i < this.pipeArray.length; i++) {
+      if (this.checkBirdPipeCollision(this.pipeArray[i])) {
+        this.bird.isDead = true;
+        this.gameOver();
+      }
+    }
   }
 
-//   checkBirdPipeCollision(pipe) {
-//     if (this.bird.b)
-//       if (
-//         this.bird.birdPositionX < rect2.x + rect2.width &&
-//         this.bird.birdPositionX + this.bird.birdPositionX.width > rect2.x &&
-//         this.bird.birdPositionY < rect2.y + rect2.height &&
-//         this.bird.birdPositionY + this.bird.birdPositionX.height > rect2.y
-//       ) {
-//         // collision detected!
-//       }
+  checkBirdPipeCollision(pipe) {
+    if (
+      this.bird.birdPositionX < pipe.pipeLeftValue + pipe.pipeWidth &&
+      this.bird.birdPositionX + this.bird.birdWidth > pipe.pipeLeftValue &&
+      this.bird.birdPositionY < 0 + pipe.pipeTopHeight &&
+      this.bird.birdPositionY + this.bird.birdHeight > 0
+    ) {
+      // collision detected!
+      return true;
+    }
+
+    if (
+      this.bird.birdPositionX < pipe.pipeLeftValue + pipe.pipeWidth &&
+      this.bird.birdPositionX + this.bird.birdWidth > pipe.pipeLeftValue &&
+      this.bird.birdPositionY < pipe.pipeBottomPositionY + pipe.pipeBottomHeight &&
+      this.bird.birdPositionY + this.bird.birdHeight > pipe.pipeBottomPositionY
+    ) {
+      // collision detected!
+      return true;
+    }
+  }
+
+  updateScore() {
+    this.scoreDisplay.innerText = this.score;
+    this.checkPipePassedByPlayer();
+    for (var i = 0; i < this.pipeArray.length; i++) {
+      if (!this.pipeArray[i].isScored) {
+        if (this.pipeArray[i].passedByPlayer) {
+          this.score++;
+          this.pipeArray[i].isScored = true;
+          // console.log(this.score);
+        }
+      }
+    }
+  }
+
+  checkPipePassedByPlayer() {
+    for (var i = 0; i < this.pipeArray.length; i++) {
+      if (!this.pipeArray[i].passedByPlayer) {
+        if (
+          this.pipeArray[i].pipeLeftValue + this.pipeArray[i].pipeWidth <
+          this.bird.birdPositionX
+        ) {
+          this.pipeArray[i].passedByPlayer = true;
+        }
+      }
+    }
   }
 
   gameOver() {
     clearInterval(this.play);
+    document.onkeydown = null;
+    this.gameOverMenu();
+  }
+
+  gameOverMenu() {
+    this.scoreDisplay.style.display = 'none';
+    this.gameOverDisplay = document.createElement('div');
+    this.gameOverDisplay.classList.add('game-over');
+    this.gameContainer.appendChild(this.gameOverDisplay);
+    this.highscoreDisplay = document.createElement('div');
+    this.highscoreDisplay.classList.add('high-score');
+    this.endScoreDisplay = document.createElement('div');
+    this.endScoreDisplay.classList.add('end-score');
+    this.gameOverDisplay.appendChild(this.endScoreDisplay);
+    this.gameOverDisplay.appendChild(this.highscoreDisplay);
+    this.endScoreDisplay.innerText = this.score;
+    this.setHighScore();
+
+    document.onkeydown = event => {
+      if (event.code == 'Space') {
+        this.gameContainer.innerHTML = '';
+        this.init();
+        // this.createField();
+        this.createScoreDisplay();
+        this.createBird();
+        this.play = setInterval(this.startGame.bind(this), this.frameLimit);
+      }
+    };
+  }
+
+  setHighScore() {
+    if (!localStorage.getItem('highscore')) {
+      localStorage.setItem('highscore', this.score);
+    } else {
+      var highscore = parseInt(localStorage.getItem('highscore'));
+      if (this.score > highscore) {
+        localStorage.setItem('highscore', this.score);
+      }
+    }
+    this.highscoreDisplay.innerText = `${localStorage.getItem('highscore')}`;
   }
 }
 

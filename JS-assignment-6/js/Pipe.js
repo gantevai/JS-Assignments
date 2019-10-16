@@ -5,12 +5,14 @@ function getRandomValue(min, max) {
 }
 
 class Pipe {
-  gapBetweenPipes = 150;
+  gapBetweenPipes = 180;
   minPipeHeight = 20;
   maxPipeHeight = 300;
   pipeWidth = 70;
   skyHeight = 512;
   isDestroyed = false;
+  passedByPlayer = false;
+  isScored = false;
   constructor(gameContainer) {
     this.gameContainer = gameContainer;
     this.create();
@@ -29,10 +31,12 @@ class Pipe {
   }
 
   setRandomHeight() {
-    var randomHeight = getRandomValue(this.minPipeHeight, this.maxPipeHeight);
-    this.pipeTop.style.height = randomHeight + 'px';
-    this.pipeBottom.style.height = this.skyHeight - randomHeight - this.gapBetweenPipes + 'px';
-    this.pipeBottom.style.top = randomHeight + this.gapBetweenPipes + 'px';
+    this.pipeTopHeight = getRandomValue(this.minPipeHeight, this.maxPipeHeight);
+    this.pipeTop.style.height = this.pipeTopHeight + 'px';
+    this.pipeBottomHeight = this.skyHeight - this.pipeTopHeight - this.gapBetweenPipes;
+    this.pipeBottom.style.height = this.pipeBottomHeight + 'px';
+    this.pipeBottomPositionY = this.pipeTopHeight + this.gapBetweenPipes;
+    this.pipeBottom.style.top = this.pipeBottomPositionY + 'px';
   }
 
   move() {
@@ -56,5 +60,6 @@ class Pipe {
     this.gameContainer.removeChild(this.pipeTop);
     this.gameContainer.removeChild(this.pipeBottom);
   }
+
 }
 export default Pipe;

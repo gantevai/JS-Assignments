@@ -1,5 +1,11 @@
+@font-face {
+  font-family: 'FlappyFont';
+  font-style: normal;
+  font-weight: normal;
+  src: url('../fonts/04B_19__.woff') format('woff');
+}
 .game-container {
-  margin: 0 auto;
+  float: left;
   position: relative;
   overflow: hidden;
 }
@@ -40,4 +46,45 @@
 
 .invert-pipe {
   transform: rotate(180deg);
+}
+
+.score-display {
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 60px;
+  z-index: 1;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+.end-score,
+.high-score {
+  font-size: 40px;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  margin-top: 80px;
+  margin-left: 15px;
+  width: 70px;
+  text-align: center;
+  display: inline-block;
+}
+
+.high-score {
+  margin-left: 50px;
+}
+
+.start-menu,
+.game-over {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  width: 210px;
+  height: 185px;
+  transform: translateX(-50%);
+  background-image: url(../images/start.png);
+  background-size: cover;
+}
+
+.game-over {
+  background-image: url(../images/game-over.png);
 }
