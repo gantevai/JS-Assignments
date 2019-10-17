@@ -1,0 +1,14 @@
+body {
+  background-color: black;
+}
+.container {
+  width: 100%;
+  position: relative;
+  height: 600px;
+}
+
+.dots {
+  border-radius: 50%;
+  background-color: red;
+  position: absolute;
+}
