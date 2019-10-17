@@ -60,6 +60,5 @@ class Pipe {
     this.gameContainer.removeChild(this.pipeTop);
     this.gameContainer.removeChild(this.pipeBottom);
   }
-
 }
 export default Pipe;

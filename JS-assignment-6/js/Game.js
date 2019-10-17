@@ -12,6 +12,7 @@ GAMEOVER_AUDIO.src = 'audio/gameover.mp3';
 
 class Game {
   skyHeight = 512;
+
   constructor(fps) {
     this.fps = fps;
     this.init();
@@ -21,6 +22,49 @@ class Game {
     this.startMenu();
   }
 
+  /**
+   * Initialize all the required variables and constants needed for game
+   */
+  init() {
+    this.frameLimit = 1000 / this.fps;
+    this.gameContainerWidth = 600;
+    this.gameContainerHeight = 650;
+    this.backgroundSpeed = 0.25;
+    this.groundSpeed = 2;
+    this.gravity = 0.25;
+    this.flyGravityValue = -3;
+    this.jumpPower = 75;
+    this.pipeArray = [];
+    this.score = 0;
+    this.pipeCreationCounter = 0; // counter to manage the interval between pipes
+    this.animateBirdCounter = 0; // counter to manage animation of bird
+  }
+
+  /**
+   * Create containers for game
+   */
+  createField() {
+    this.body = document.getElementsByTagName('body')[0];
+    this.gameContainer = document.createElement('div');
+    this.gameContainer.classList.add('game-container');
+    this.gameContainer.style.width = this.gameContainerWidth + 'px';
+    this.gameContainer.style.height = this.gameContainerHeight + 'px';
+    this.body.appendChild(this.gameContainer);
+  }
+
+  /**
+   * Create display area for score
+   */
+  createScoreDisplay() {
+    this.scoreDisplay = document.createElement('div');
+    this.scoreDisplay.classList.add('score-display');
+    this.gameContainer.appendChild(this.scoreDisplay);
+    this.createBackgroundAndGround();
+  }
+
+  /**
+   * Shows start screen of game
+   */
   startMenu() {
     this.startDisplay = document.createElement('div');
     this.startDisplay.classList.add('start-menu');
@@ -28,6 +72,11 @@ class Game {
     this.handleMovement();
   }
 
+  /**
+   * For starting the main game or restarting after gameover
+   * if argument 'true' is passed then it assumes restart after gameover
+   * else it assumes starting of the game
+   */
   handleMovement(restart) {
     document.onkeydown = event => {
       if (event.code == 'Space') {
@@ -73,6 +122,11 @@ class Game {
     };
   }
 
+  /**
+   * Start the game by running all required function for game
+   * animateBirdCounter is used to manage interval for bird flying animation
+   * and pipeCreationCounter is used to manage interval for creation of pipes
+   */
   startGame() {
     this.checkKeyPress();
     this.moveBackground();
@@ -83,50 +137,22 @@ class Game {
     }
     this.animateBirdCounter++;
     this.gravity += 0.25;
-    this.pipeMovementCounter++;
-    if (this.pipeMovementCounter == 120) {
+    this.pipeCreationCounter++;
+    if (this.pipeCreationCounter == 120) {
       this.createPipes();
-      this.pipeMovementCounter = 0;
+      this.pipeCreationCounter = 0;
     }
     this.movePipes();
     this.updateScore();
-  }
-
-  init() {
-    this.frameLimit = 1000 / this.fps;
-    this.gameContainerWidth = 600;
-    this.gameContainerHeight = 650;
-    this.backgroundSpeed = 0.25;
-    this.groundSpeed = 2;
-    this.gravity = 0.25;
-    this.flyGravityValue = -3;
-    this.jumpPower = 75;
-    this.pipeArray = [];
-    this.score = 0;
-    this.pipeMovementCounter = 0; // counter to manage the interval between pipes
-    this.animateBirdCounter = 0; // counter to manage animation of bird
-  }
-
-  createField() {
-    this.body = document.getElementsByTagName('body')[0];
-    this.gameContainer = document.createElement('div');
-    this.gameContainer.classList.add('game-container');
-    this.gameContainer.style.width = this.gameContainerWidth + 'px';
-    this.gameContainer.style.height = this.gameContainerHeight + 'px';
-    this.body.appendChild(this.gameContainer);
-  }
-
-  createScoreDisplay() {
-    this.scoreDisplay = document.createElement('div');
-    this.scoreDisplay.classList.add('score-display');
-    this.gameContainer.appendChild(this.scoreDisplay);
-    this.createBackgroundAndGround();
   }
 
   createBird() {
     this.bird = new Bird(this.gameContainer);
   }
 
+  /**
+   * create the container for sky image and the ground image at background
+   */
   createBackgroundAndGround() {
     this.backgroundWrapper = document.createElement('div');
     this.backgroundWrapper.classList.add('background-wrapper');
@@ -137,6 +163,10 @@ class Game {
     this.backgroundLeft = 0;
     this.groundLeft = 0;
   }
+
+  /**
+   * Give moving effect to Background
+   */
 
   moveBackground() {
     this.backgroundLeft -= this.backgroundSpeed;
@@ -152,6 +182,9 @@ class Game {
     this.groundWrapper.style.left = this.groundLeft + 'px';
   }
 
+  /**
+   * Handle the key press and mouse click event
+   */
   checkKeyPress() {
     document.onkeydown = event => {
       if (event.code == 'Space') {
@@ -183,8 +216,8 @@ class Game {
     if (this.bird.isDead) {
       this.gameOver();
     }
-    //Check if first pipe is out of screen
 
+    //Check if first pipe is out of screen
     if (this.pipeArray.length != 0) {
       this.pipeArray[0].checkPipeOutOfScreen();
       if (this.pipeArray[0].isDestroyed) {
@@ -192,6 +225,7 @@ class Game {
       }
     }
 
+    //Check the collision of bird with pipe
     for (var i = 0; i < this.pipeArray.length; i++) {
       if (this.checkBirdPipeCollision(this.pipeArray[i])) {
         this.bird.isDead = true;
