@@ -5,6 +5,8 @@ class Bird {
   birdPositionY = 200;
   birdBackgroundPositionX = 0;
   isDead = false;
+  endOfSprite = -174;
+  skyHeight = 512;
 
   constructor(gameContainer) {
     this.gameContainer = gameContainer;
@@ -65,13 +67,13 @@ class Bird {
   animateBirdFly() {
     this.birdElement.style.backgroundPositionX = this.birdBackgroundPositionX + 'px';
     this.birdBackgroundPositionX -= this.birdWidth;
-    if (this.birdBackgroundPositionX <= -174) {
+    if (this.birdBackgroundPositionX <= -this.endOfSprite) {
       this.birdBackgroundPositionX = 0;
     }
   }
 
   checkUpDownCollision() {
-    if (this.birdPositionY <= 0 || this.birdPositionY + this.birdHeight >= 512) {
+    if (this.birdPositionY <= 0 || this.birdPositionY + this.birdHeight >= this.skyHeight) {
       this.isDead = true;
     }
   }

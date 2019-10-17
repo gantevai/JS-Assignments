@@ -8,6 +8,7 @@ class Pipe {
   gapBetweenPipes = 180;
   minPipeHeight = 20;
   maxPipeHeight = 300;
+  pipeSpeed = 2;
   pipeWidth = 70;
   skyHeight = 512;
   isDestroyed = false;
@@ -40,7 +41,7 @@ class Pipe {
   }
 
   move() {
-    this.pipeLeftValue -= 2;
+    this.pipeLeftValue -= this.pipeSpeed;
     this.updatePipePosition();
   }
 
