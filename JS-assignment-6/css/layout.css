@@ -10,6 +10,7 @@ body {
 }
 .game-container {
   float: left;
+  margin: 0 10px;
   /* margin: auto; */
   position: relative;
   overflow: hidden;
