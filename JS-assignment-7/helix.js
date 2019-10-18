@@ -6,10 +6,10 @@ class Helix {
     this.maxCircleSize = 20;
     this.frameCount = 0;
     this.numRows = 10;
-    this.numCols = 15;
+    this.numCols = 10;
     this.numStrands = 2;
     this.gapBetweenCols = 30;
-    this.gapBetweenRows = 20;
+    this.gapBetweenRows = 15;
     this.elementPositionY = 200;
     this.elementPositionX = 500;
     this.container = document.getElementById(containerID);
